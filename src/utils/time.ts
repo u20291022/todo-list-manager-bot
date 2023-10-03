@@ -28,6 +28,13 @@ class Time {
 
     return date.getTime() - timeZoneOffset; // get GMT+00:00 time
   }
+
+  public getCurrentTimestamp(): number {
+    const date = new Date();
+    const timeZoneOffset = date.getTimezoneOffset() * 60 * 1000;
+
+    return date.getTime() - timeZoneOffset; // get GMT+00:00 time
+  }
 }
 
 export const time = new Time();

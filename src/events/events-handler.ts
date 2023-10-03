@@ -1,18 +1,49 @@
 import { Telegram } from "telegraf";
 import { Event } from "../types/event.types";
+import { fileSystem } from "../utils/filesystem";
 import { logs } from "../utils/logs";
+import { time } from "../utils/time";
 
 class EventsHandler {
-  public handle(
-    event: Event,
-    chatId: number | string,
-    methods: Telegram
-  ): void {
-    const scheduledText = `На сегодня у вас запланировано событие: ${event.text}`;
+  public readonly eventsDataPath = fileSystem.dataDirPath + "/events.json";
+  private events: Event[] = [];
 
-    //@ts-ignore cuz schedule_date is not in interface
-    methods.sendMessage(chatId, scheduledText, { schedule_date: event.time });
-    logs.write("Event reminder (" + event.text + ") was send!");
+  constructor() {
+    if (!fileSystem.exists(this.eventsDataPath)) {
+      fileSystem.writeJson(this.eventsDataPath, {});
+      return;
+    }
+
+    this.events = fileSystem.readJson(this.eventsDataPath);
+  }
+
+  private updateEventsDataFile(): void {
+    fileSystem.writeJson(this.eventsDataPath, this.events);
+  }
+
+  public handle(event: Event, chatId: number | string, methods: Telegram): void {
+    if (event.time !== 0) {
+      this.events.push(event);
+      logs.write("Event reminder (" + event.text + ") was scheduled!");
+    }
+
+    this.updateEventsDataFile();
+  }
+
+  public interval(methods: Telegram): void {
+    setInterval(() => {
+      const currentTimestamp = time.getCurrentTimestamp();
+
+      this.events.forEach((event, index) => {
+        if (event.time <= currentTimestamp) {
+          console.log(event.time, currentTimestamp)
+          methods.sendMessage(event.chatId, `На сегодня у вас запланировано событие:\n${event.text}`);
+          this.events.splice(index, 1);
+        }
+      })
+
+      this.updateEventsDataFile();
+    }, 10000);
   }
 }
 

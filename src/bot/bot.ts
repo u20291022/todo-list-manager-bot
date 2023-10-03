@@ -2,6 +2,7 @@ import { Telegraf, Telegram } from "telegraf";
 import { logs } from "../utils/logs";
 import { commands } from "./commands";
 import { StartCommandContext, EventCommandContext } from "../types/bot.types";
+import { eventsHandler } from "../events/events-handler";
 
 export class Bot {
   public readonly me: Telegraf;
@@ -28,11 +29,14 @@ export class Bot {
 
   public launch(): void {
     commands.setBotCommands(this.me);
-
+    
     this.listenStartCommand();
     this.listenEventCommand();
 
     this.me.launch();
     logs.write("Bot was started!");
+
+    eventsHandler.interval(this.methods);
+    logs.write("Events interval was started!");
   }
 }

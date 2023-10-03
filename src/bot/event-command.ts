@@ -34,9 +34,9 @@ class EventCommand {
       dateString === "-" ? 0 : time.convertDateStringIntoTimestamp(dateString);
 
     const eventText = args.slice(1).join(" "); // First is date. All other is text.
-    const event: Event = { time: eventTime, text: eventText };
+    const event: Event = { time: eventTime, text: eventText, chatId: chat.id };
 
-    methods.sendMessage(channelId, eventText);
+    methods.sendMessage(channelId, `${eventText}${eventTime !== 0 ? "\nСобытие на " + dateString: ""}`);
 
     eventsHandler.handle(event, chat.id, methods);
     methods.sendMessage(

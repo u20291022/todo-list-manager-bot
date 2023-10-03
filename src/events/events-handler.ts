@@ -10,7 +10,7 @@ class EventsHandler {
 
   constructor() {
     if (!fileSystem.exists(this.eventsDataPath)) {
-      fileSystem.writeJson(this.eventsDataPath, {});
+      fileSystem.writeJson(this.eventsDataPath, []);
       return;
     }
 
@@ -21,7 +21,17 @@ class EventsHandler {
     fileSystem.writeJson(this.eventsDataPath, this.events);
   }
 
-  public handle(event: Event, chatId: number | string, methods: Telegram): void {
+  public deleteEvent(messageId: string | number): void {
+    this.events.forEach((event, index) => {
+      if (event.messageId === messageId) {
+        this.events.splice(index, 1);
+      }
+    })
+
+    this.updateEventsDataFile();
+  }
+
+  public handle(event: Event): void {
     if (event.time !== 0) {
       this.events.push(event);
       logs.write("Event reminder (" + event.text + ") was scheduled!");
@@ -36,13 +46,10 @@ class EventsHandler {
 
       this.events.forEach((event, index) => {
         if (event.time <= currentTimestamp) {
-          console.log(event.time, currentTimestamp)
           methods.sendMessage(event.chatId, `На сегодня у вас запланировано событие:\n${event.text}`);
-          this.events.splice(index, 1);
+          this.deleteEvent(event.messageId);
         }
       })
-
-      this.updateEventsDataFile();
     }, 10000);
   }
 }

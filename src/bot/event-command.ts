@@ -1,16 +1,31 @@
 import { Telegram } from "telegraf";
-import { EventCommandContext } from "../types/bot.types";
+import { EventCommandContext, SendMessageResult } from "../types/bot.types";
 import { time } from "../utils/time";
 import { eventsHandler } from "../events/events-handler";
 import { Event } from "../types/event.types";
 import { logs } from "../utils/logs";
+import { queryHandler } from "./query-handler";
 
 class EventCommand {
-  public run(
+  private async sendEventToChannel(
+    event: Event,
+    methods: Telegram
+  ): Promise<SendMessageResult> {
+    const eventText =
+      event.text + "\n" + (event.time !== 0 ? event.dateString : "");
+
+    return methods.sendMessage(event.channelId, eventText, {
+      reply_markup: {
+        inline_keyboard: queryHandler.DefaultKeyboard,
+      },
+    });
+  }
+
+  public async run(
     eventCommandContext: EventCommandContext,
     methods: Telegram
-  ): void {
-    const { chat, args } = eventCommandContext;
+  ): Promise<void> {
+    const { chat, args, message } = eventCommandContext;
     const channelId = process.env["CHANNEL_ID"];
 
     if (!channelId) {
@@ -34,11 +49,20 @@ class EventCommand {
       dateString === "-" ? 0 : time.convertDateStringIntoTimestamp(dateString);
 
     const eventText = args.slice(1).join(" "); // First is date. All other is text.
-    const event: Event = { time: eventTime, text: eventText, chatId: chat.id };
+    const event: Event = {
+      dateString: dateString,
+      time: eventTime,
+      text: eventText,
+      chatId: chat.id,
+      channelId: channelId,
+      messageId: -1,
+    };
 
-    methods.sendMessage(channelId, `${eventText}${eventTime !== 0 ? "\nСобытие на " + dateString: ""}`);
+    const channelMessageData = await this.sendEventToChannel(event, methods);
+    event.messageId = channelMessageData.message_id; // Set channel message id for delete query
 
-    eventsHandler.handle(event, chat.id, methods);
+    eventsHandler.handle(event);
+
     methods.sendMessage(
       chat.id,
       `Событие было записано${eventTime !== 0 ? " на " + dateString : ""}.`

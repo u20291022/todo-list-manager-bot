@@ -1,0 +1,16 @@
+{
+  "name": "todo-list-manager-bot",
+  "version": "1.0.0",
+  "description": "Telegram bot for To-Do list channel",
+  "main": "src/index.ts",
+  "scripts": {
+    "start": "tsc & node dist/index.js"
+  },
+  "author": "u20291022",
+  "license": "MIT",
+  "dependencies": {
+    "@types/node": "^20.8.2",
+    "dotenv": "^16.3.1",
+    "telegraf": "^4.14.0"
+  }
+}

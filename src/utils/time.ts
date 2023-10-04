@@ -15,9 +15,9 @@ class Time {
       .split(".")
       .map((v) => Number(v));
 
-    if (!day || !month || !year) {
-      return 0;
-    }
+    year = !year ? new Date().getFullYear() : year;
+    month = !month ? new Date().getMonth() + 1 : month;
+    day = !day ? new Date().getDate() : day;
 
     if (year.toString().length === 2) {
       year += 2000;
@@ -30,6 +30,13 @@ class Time {
   public getCurrentTimestamp(): number {
     const date = new Date();
     return date.getTime();
+  }
+
+  public convertDateStringIntoFullDate(dateString: string): string {
+    const dateTimestamp = this.convertDateStringIntoTimestamp(dateString);
+    const date = new Date(dateTimestamp);
+
+    return date.toLocaleDateString("ru-RU", { dateStyle: "long" });
   }
 }
 

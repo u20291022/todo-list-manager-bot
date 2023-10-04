@@ -36,21 +36,29 @@ class EventCommand {
       return;
     }
 
-    if (args.length < 2) {
+    if (args.length < 1) {
       methods.sendMessage(
         chat.id,
-        "Использование команды event: /event дата текст_события."
+        "Использование команды event: /event дата? текст_события."
       );
       return;
     }
 
     const dateString = args[0]; // 31.12.2023 31 December of 2023
+    const dateArgIsMissing = dateString.split(".").length < 2;
     const eventTime =
-      dateString === "-" ? 0 : time.convertDateStringIntoTimestamp(dateString);
+      dateString === "-" || dateArgIsMissing
+        ? 0
+        : time.convertDateStringIntoTimestamp(dateString);
 
-    const eventText = args.slice(1).join(" "); // First is date. All other is text.
+    const eventText = dateArgIsMissing
+      ? args.join(" ")
+      : args.slice(1).join(" "); // First is date. All other is text.
+
+    const fullDateString = time.convertDateStringIntoFullDate(dateString);
+
     const event: Event = {
-      dateString: dateString,
+      dateString: fullDateString,
       time: eventTime,
       text: eventText,
       chatId: chat.id,

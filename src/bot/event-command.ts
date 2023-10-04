@@ -10,15 +10,18 @@ class EventCommand {
   private async sendEventToChannel(
     event: Event,
     methods: Telegram
-  ): Promise<SendMessageResult> {
+  ): Promise<SendMessageResult | null> {
     const eventText =
       event.text + "\n" + (event.time !== 0 ? event.dateString : "");
 
-    return methods.sendMessage(event.channelId, eventText, {
-      reply_markup: {
-        inline_keyboard: queryHandler.DefaultKeyboard,
-      },
-    });
+    const channelMessageData = methods
+      .sendMessage(event.channelId, eventText, {
+        reply_markup: {
+          inline_keyboard: queryHandler.DefaultKeyboard,
+        },
+      }).catch(() => { return null });
+
+    return channelMessageData;
   }
 
   public async run(
@@ -29,18 +32,22 @@ class EventCommand {
     const channelId = process.env["CHANNEL_ID"];
 
     if (!channelId) {
-      methods.sendMessage(
-        chat.id,
-        "Я не могу отправить это событие, так как id канала не указан!"
-      );
+      methods
+        .sendMessage(
+          chat.id,
+          "Я не могу отправить это событие, так как id канала не указан!"
+        )
+        .catch(() => {});
       return;
     }
 
     if (args.length < 1) {
-      methods.sendMessage(
-        chat.id,
-        "Использование команды event: /event дата? текст_события."
-      );
+      methods
+        .sendMessage(
+          chat.id,
+          "Использование команды event: /event дата? текст_события."
+        )
+        .catch(() => {});
       return;
     }
 
@@ -67,14 +74,21 @@ class EventCommand {
     };
 
     const channelMessageData = await this.sendEventToChannel(event, methods);
+
+    if (!channelMessageData) {
+      return;
+    }
+
     event.messageId = channelMessageData.message_id; // Set channel message id for delete query
 
     eventsHandler.handle(event);
 
-    methods.sendMessage(
-      chat.id,
-      `Событие было записано${eventTime !== 0 ? " на " + dateString : ""}.`
-    );
+    methods
+      .sendMessage(
+        chat.id,
+        `Событие было записано${eventTime !== 0 ? " на " + dateString : ""}.`
+      )
+      .catch(() => {});
 
     logs.write(`New event on ${dateString}!`);
   }

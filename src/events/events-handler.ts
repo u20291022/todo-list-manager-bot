@@ -43,13 +43,32 @@ class EventsHandler {
   public interval(methods: Telegram): void {
     setInterval(() => {
       const currentTimestamp = time.getCurrentTimestamp();
-      
-      this.events.forEach((event, index) => {
+      const todayEventsText: string[] = [];
+      const todayEventsMessageIds: (string | number)[] = []; 
+      let eventsChatId: string | number = -1;
+
+      this.events.forEach(event => {
         if (event.time <= currentTimestamp) {
-          methods.sendMessage(event.chatId, `На сегодня у вас запланировано событие:\n${event.text}`);
-          this.deleteEvent(event.messageId);
+          eventsChatId = event.chatId;
+
+          todayEventsText.push(event.text);
+          todayEventsMessageIds.push(event.messageId);
         }
-      })
+      });
+
+      todayEventsMessageIds.forEach(id => this.deleteEvent(id));
+
+      if (todayEventsText.length > 0) {
+        const plural = todayEventsText.length > 1;
+        const mainText =
+          `На сегодня у вас запланирован${plural ? "ы" : "о"} событи${plural ? "я" : "е"}:\n`;
+
+        const eventsText = todayEventsText.join("\n");
+
+        const messageText = mainText + eventsText;
+
+        methods.sendMessage(eventsChatId, messageText).catch(() => {});
+      }
     }, 10000);
   }
 }

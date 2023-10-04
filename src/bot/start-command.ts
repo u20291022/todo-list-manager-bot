@@ -18,7 +18,7 @@ class StartCommand {
     const { chat } = startCommandContext;
     const startText = this.getStartText();
 
-    methods.sendMessage(chat.id, startText, { parse_mode: "HTML" });
+    methods.sendMessage(chat.id, startText, { parse_mode: "HTML" }).catch(() => {});
   }
 }
 

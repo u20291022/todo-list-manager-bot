@@ -43,7 +43,7 @@ class EventsHandler {
   public interval(methods: Telegram): void {
     setInterval(() => {
       const currentTimestamp = time.getCurrentTimestamp();
-
+      
       this.events.forEach((event, index) => {
         if (event.time <= currentTimestamp) {
           methods.sendMessage(event.chatId, `На сегодня у вас запланировано событие:\n${event.text}`);

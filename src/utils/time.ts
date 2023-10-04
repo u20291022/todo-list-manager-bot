@@ -23,17 +23,13 @@ class Time {
       year += 2000;
     }
 
-    const date = new Date(year, month - 1, day);
-    const timeZoneOffset = date.getTimezoneOffset() * 60 * 1000;
-
-    return date.getTime() - timeZoneOffset; // get GMT+00:00 time
+    const date = new Date(year, month - 1, day, 14, 1, 20);
+    return date.getTime();
   }
 
   public getCurrentTimestamp(): number {
     const date = new Date();
-    const timeZoneOffset = date.getTimezoneOffset() * 60 * 1000;
-
-    return date.getTime() - timeZoneOffset; // get GMT+00:00 time
+    return date.getTime();
   }
 }
 

@@ -23,7 +23,7 @@ class Time {
       year += 2000;
     }
 
-    const date = new Date(year, month - 1, day, 14, 1, 20);
+    const date = new Date(year, month - 1, day); // month - 1 cuz counting starts at 0 (0 - january)
     return date.getTime();
   }
 

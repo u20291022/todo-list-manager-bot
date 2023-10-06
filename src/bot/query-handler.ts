@@ -67,7 +67,10 @@ class QueryHandler {
     }
 
     if (data === "DeleteConfirm") {
-      methods.deleteMessage(chatId, Number(messageId)).catch(() => {});
+      try {
+        methods.deleteMessage(chatId, Number(messageId));
+      } catch(err) {}
+      
       eventsHandler.deleteEvent(messageId);
     }
 

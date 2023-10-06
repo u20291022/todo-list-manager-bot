@@ -10,7 +10,7 @@ class Time {
     return dateString.replace(/\./g, "-");
   }
 
-  public convertDateStringIntoTimestamp(dateString: string): number {
+  public convertDateStringIntoTimestamp(dateString: string, gmt = false): number {
     let [day, month, year]: number[] = dateString
       .split(".")
       .map((v) => Number(v));
@@ -27,7 +27,7 @@ class Time {
     const timeOffset = date.getTimezoneOffset() * 60 * 1000;
     const myTimeOffset = 7 * 60 * 60 * 1000;
 
-    return (date.getTime() - timeOffset) - myTimeOffset;
+    return gmt ? (date.getTime() - timeOffset) : (date.getTime() - timeOffset) - myTimeOffset;
   }
 
   public getCurrentTimestamp(): number {
@@ -38,7 +38,7 @@ class Time {
   }
 
   public convertDateStringIntoFullDate(dateString: string): string {
-    const dateTimestamp = this.convertDateStringIntoTimestamp(dateString);
+    const dateTimestamp = this.convertDateStringIntoTimestamp(dateString, true);
     const date = new Date(dateTimestamp);
 
     return date.toLocaleDateString("ru-RU", { dateStyle: "long" });

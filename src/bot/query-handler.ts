@@ -33,7 +33,7 @@ class QueryHandler {
     ],
   ];
 
-  public handle(queryData: QueryData, methods: Telegram) {
+  public async handle(queryData: QueryData, methods: Telegram) {
     const data = queryData.data;
     const messageId = queryData.messageId;
     const chatId = queryData.chatId;
@@ -68,7 +68,7 @@ class QueryHandler {
 
     if (data === "DeleteConfirm") {
       try {
-        methods.deleteMessage(chatId, Number(messageId));
+        (await methods.deleteMessage(chatId, Number(messageId)));
       } catch(err) {}
       
       eventsHandler.deleteEvent(messageId);

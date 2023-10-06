@@ -45,29 +45,29 @@ class QueryHandler {
     if (data === "Back") {
       methods.editMessageReplyMarkup(chatId, Number(messageId), undefined, {
         inline_keyboard: this.DefaultKeyboard,
-      });
+      }).catch(() => {});
     }
 
     if (data === "Completed") {
       methods.editMessageReplyMarkup(chatId, Number(messageId), undefined, {
         inline_keyboard: this.CompletedKeyboard,
-      });
+      }).catch(() => {});
     }
 
     if (data === "DeleteCompleted") {
       methods.editMessageReplyMarkup(chatId, Number(messageId), undefined, {
         inline_keyboard: this.DeleteCompletedKeyboard,
-      });
+      }).catch(() => {});
     }
 
     if (data === "Delete") {
       methods.editMessageReplyMarkup(chatId, Number(messageId), undefined, {
         inline_keyboard: this.DeleteKeyboard,
-      });
+      }).catch(() => {});
     }
 
     if (data === "DeleteConfirm") {
-      methods.deleteMessage(chatId, Number(messageId));
+      methods.deleteMessage(chatId, Number(messageId)).catch(() => {});
       eventsHandler.deleteEvent(messageId);
     }
 

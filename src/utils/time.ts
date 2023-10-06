@@ -24,12 +24,17 @@ class Time {
     }
 
     const date = new Date(year, month - 1, day); // month - 1 cuz counting starts at 0 (0 - january)
-    return date.getTime();
+    const timeOffset = date.getTimezoneOffset() * 60 * 1000;
+    const myTimeOffset = 7 * 60 * 60 * 1000;
+
+    return (date.getTime() - timeOffset) - myTimeOffset;
   }
 
   public getCurrentTimestamp(): number {
     const date = new Date();
-    return date.getTime();
+    const timeOffset = date.getTimezoneOffset() * 60 * 1000;
+
+    return date.getTime() - timeOffset;
   }
 
   public convertDateStringIntoFullDate(dateString: string): string {

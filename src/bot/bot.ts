@@ -51,7 +51,7 @@ export class Bot {
         ctx.answerCbQuery();
         return;
       }
-
+      
       const queryData: QueryData = {
         data: query.data,
         messageId: query.message?.message_id,
@@ -64,9 +64,7 @@ export class Bot {
   }
 
   public async launch(): Promise<void> {
-    try {
-      await commands.setBotCommands(this.me);
-    } catch {}
+    await commands.setBotCommands(this.me);
 
     this.listenStartCommand();
     this.listenEventCommand();
